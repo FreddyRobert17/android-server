@@ -44,11 +44,7 @@ function findUser(id){
 
   const users = JSON.parse(response);
 
-  console.log(users, 'users');
-
-  const user = users.find(element => element.id == id)
-
-  console.log(user, 'user');
+  const user = users.find(element => element.id == id);
 
   if(!user){
     throw new Error(`Couldn't find user with id: ${id}`)
@@ -57,4 +53,29 @@ function findUser(id){
   return user
 }
 
-module.exports = { createUser, isAuthUser, findUser };
+function updateUser(id, username, email, password){
+  const response = fs.readFileSync("./data/users.json");
+
+  const users = JSON.parse(response);
+
+  const user = {
+    id,
+    username,
+    email,
+    password
+  }
+
+  users.forEach((element, index) => {
+    if(element.id == id){
+      return users[index] = user
+    }
+  })
+
+  const jsonString = JSON.stringify(users);
+
+  fs.writeFileSync("./data/users.json", jsonString);
+
+  return user;
+}
+
+module.exports = { createUser, isAuthUser, findUser, updateUser };

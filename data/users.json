@@ -4,11 +4,5 @@
     "username": "user1",
     "email": "user@gmail.com",
     "password": "123"
-  },
-  {
-    "id": "5dbc2386-b290-494a-83df-683a4359f533",
-    "username": "freuser",
-    "email": "fre@gmail.com",
-    "password": "123456"
   }
 ]

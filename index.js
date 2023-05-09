@@ -1,11 +1,15 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const bodyParser = require('body-parser')
-const { createUser, isAuthUser } = require('./services/users.service')
-const { createTweet, getAllTweets, findTweet, likeTweet} = require('./services/tweets.service')
+const multer = require('multer')
+const path = require('path')
+const url = require('url');
+const { createUser, isAuthUser, findUser, updateUser } = require('./services/users.service')
+const { createTweet, getAllTweets, findTweet, likeTweet, deleteTweet } = require('./services/tweets.service')
 
 const app = express()
 const port = 3000
+const upload = multer({dest: 'uploads/'})
 const secret = 'secret_token_key' // process.env.SECRET
 
 app.use(bodyParser.json())
@@ -21,8 +25,6 @@ app.post('/auth/register', (req, res) => {
 
     const createdUser = createUser(body)
 
-    console.log(createdUser)
-
     const token = jwt.sign({
         sub: createdUser,
         exp: Date.now() + 60 * 60 * 1000
@@ -31,6 +33,9 @@ app.post('/auth/register', (req, res) => {
     res.send( { 
         access_token : token,
         id: createdUser.id,
+        username: createdUser.username,
+        email:createdUser.email,
+        password: createdUser.password
     } )
 })
 
@@ -44,9 +49,9 @@ app.post('/auth/login', async (req, res) => {
 
     const payload = jwt.verify(token, secret)
 
-    if(Date.now() > payload.exp){
-        return res.status(401).send({error: 'Token expired'})
-    }
+    //if(Date.now() > payload.exp){
+      //return res.status(401).send({error: 'Token expired'})
+    //}
 
     const user = req.body
 
@@ -68,8 +73,6 @@ app.get('/tweets/all', (req, res) => {
 app.post('/tweets/create', (req, res) => {
     const { message, userId  } = req.body
 
-    console.log(message, userId)
-
     if(!message){
         return res.send("You have to send a message in body")
     }
@@ -88,6 +91,40 @@ app.post('/tweets/like/:userId&:tweetId', (req, res) => {
 
     res.json(updatedTweet)
 })
+
+app.delete('/tweets/:tweetId', (req, res) => {
+    const { tweetId } = req.params
+
+    const deletedTweetId = deleteTweet(tweetId)
+
+    return res.json({
+        id: deletedTweetId
+    })
+})
+
+app.post('/user/uploadPhoto', upload.single('image') , (req, res) => {
+    const userId = req.body.userId;
+    const filename = req.file?.filename;
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    let imagePath = "";
+
+    const updatedUser = updateUser(userId, username, email, password);
+
+    const baseUrl = 'https://test.infoworldtrips.club';
+
+    if(filename){
+        imagePath = `${baseUrl}/uploads/${filename}`;
+    }
+
+    res.json({
+        photoUrl: imagePath,
+        ...updatedUser,
+    })
+})
+
+
 
 app.listen(port, function(){
     console.log(`Running server on port: ${port}`);

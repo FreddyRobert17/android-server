@@ -83,4 +83,22 @@ function likeTweet(tweet, userId){
     return updatedTweet
 }
 
-module.exports = {createTweet, getAllTweets, findTweet, likeTweet}
+function deleteTweet(tweetId){
+    const tweets = getAllTweets();
+
+    const isValidId = tweets.find(element => element.id == tweetId)
+
+    if(!isValidId){
+      throw new Error("Your id was not found")
+    }
+
+    const filteredTweets = tweets.filter(element => element.id != tweetId)
+
+    const jsonString = JSON.stringify(filteredTweets);
+
+    fs.writeFileSync("./data/tweets.json", jsonString);
+
+    return tweetId;
+}
+
+module.exports = {createTweet, getAllTweets, findTweet, likeTweet, deleteTweet}
