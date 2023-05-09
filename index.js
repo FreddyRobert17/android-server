@@ -2,8 +2,6 @@ const express = require('express')
 const jwt = require('jsonwebtoken')
 const bodyParser = require('body-parser')
 const multer = require('multer')
-const path = require('path')
-const url = require('url');
 const { createUser, isAuthUser, findUser, updateUser } = require('./services/users.service')
 const { createTweet, getAllTweets, findTweet, likeTweet, deleteTweet } = require('./services/tweets.service')
 
@@ -102,12 +100,9 @@ app.delete('/tweets/:tweetId', (req, res) => {
     })
 })
 
-app.post('/user/uploadPhoto', upload.single('image') , (req, res) => {
-    const userId = req.body.userId;
+app.post('/user/updateUserData', upload.single('image') , (req, res) => {
     const filename = req.file?.filename;
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
+    const { userId, username, email, password } = req.body;
     let imagePath = "";
 
     const updatedUser = updateUser(userId, username, email, password);
