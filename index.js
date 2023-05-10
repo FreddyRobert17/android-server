@@ -38,18 +38,7 @@ app.post('/auth/register', (req, res) => {
 })
 
 app.post('/auth/login', async (req, res) => {
-    //if(!req.headers.authorization){
-        //res.send("You need to append your token in header")
-        //return
-    //}
-
     const token = req.headers.authorization.split(" ")[1]
-
-    //const payload = jwt.verify(token, secret)
-
-    //if(Date.now() > payload.exp){
-      //return res.status(401).send({error: 'Token expired'})
-    //}
 
     const user = req.body
 
